@@ -49,7 +49,3 @@ Restoran hosteslerinin masa düzenini ve müşteri takibini kolayca yönetebilme
 ## Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır.
-
-## İletişim
-
-Sorularınız için: [e-posta@adresiniz.com](mailto:e-posta@adresiniz.com) 
