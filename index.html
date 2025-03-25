@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restoran Yönetim Sistemi</title>
+    <meta name="description" content="Restoranınızın masa düzenini ve müşterilerinizi kolayca yönetmenizi sağlayan uygulama">
+    <meta name="theme-color" content="#bd93f9">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <h1>RMS</h1>
+            </div>
+            <ul class="menu">
+                <li class="active"><a href="#" data-view="masa-duzeni"><i class="fas fa-table"></i> <span>Masa Düzeni</span></a></li>
+                <li><a href="#" data-view="istatistikler"><i class="fas fa-chart-bar"></i> <span>İstatistikler</span></a></li>
+                <li><a href="#" data-view="ayarlar"><i class="fas fa-cog"></i> <span>Ayarlar</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="view-container">
+                <!-- Masa Düzeni Görünümü -->
+                <div class="view active" id="masa-duzeni">
+                    <header>
+                        <h2>Masa Düzeni</h2>
+                        <div class="actions">
+                            <button id="masa-ekle" class="btn primary"><i class="fas fa-plus"></i> Masa Ekle</button>
+                            <button id="etiket-ekle" class="btn secondary"><i class="fas fa-tag"></i> Etiket Ekle</button>
+                        </div>
+                    </header>
+                    
+                    <div class="durum-ozeti">
+                        <div class="durum-kutu">
+                            <span>Boş Masalar</span>
+                            <h3 id="bos-masa">0</h3>
+                        </div>
+                        <div class="durum-kutu">
+                            <span>Dolu Masalar</span>
+                            <h3 id="dolu-masa">0</h3>
+                        </div>
+                        <div class="durum-kutu">
+                            <span>Toplam Masalar</span>
+                            <h3 id="toplam-masa">0</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="masa-container" id="masa-container">
+                        <!-- Masalar JavaScript ile buraya eklenecek -->
+                    </div>
+                </div>
+
+                <!-- İstatistikler Görünümü -->
+                <div class="view" id="istatistikler">
+                    <header>
+                        <h2>İstatistikler</h2>
+                        <div class="actions">
+                            <select id="istatistik-filtre">
+                                <option value="gunluk">Günlük</option>
+                                <option value="haftalik">Haftalık</option>
+                                <option value="aylik">Aylık</option>
+                            </select>
+                            <button class="btn secondary" id="rapor-indir">
+                                <i class="fas fa-download"></i> Rapor İndir
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <div class="istatistik-panel">
+                        <div class="istatistik-kart">
+                            <h3>Ortalama Masa Kullanım Süresi</h3>
+                            <p class="buyuk-deger" id="ort-kullanim">0 dk</p>
+                            <div class="grafik-konteyner">
+                                <canvas id="kullanim-grafik"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="istatistik-kart">
+                            <h3>En Yoğun Saatler</h3>
+                            <div class="grafik-konteyner">
+                                <canvas id="yogunluk-grafik"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="istatistik-kart">
+                            <h3>Garson Başına Masa Sayısı</h3>
+                            <div class="grafik-konteyner">
+                                <canvas id="garson-grafik"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ayarlar Görünümü -->
+                <div class="view" id="ayarlar">
+                    <header>
+                        <h2>Ayarlar</h2>
+                    </header>
+                    
+                    <div class="ayarlar-panel">
+                        <div class="ayar-grubu">
+                            <h3>Garson Yönetimi</h3>
+                            <div class="garson-listesi" id="garson-listesi">
+                                <!-- Garsonlar JavaScript ile buraya eklenecek -->
+                            </div>
+                            <form id="garson-ekle-form">
+                                <input type="text" id="garson-adi" placeholder="Garson Adı" required>
+                                <button type="submit" class="btn primary">Ekle</button>
+                            </form>
+                        </div>
+                        
+                        <div class="ayar-grubu">
+                            <h3>Masa Düzeni</h3>
+                            <button id="duzeni-sifirla" class="btn danger">Masa Düzenini Sıfırla</button>
+                            <button id="demo-veri" class="btn secondary">Demo Verisi Yükle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Komponenti -->
+    <div class="modal" id="masa-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Masa Detayları</h3>
+                <button class="kapat-btn" id="modal-kapat">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="masa-form">
+                    <div class="form-grup">
+                        <label for="masa-no">Masa No</label>
+                        <input type="text" id="masa-no" readonly>
+                    </div>
+                    <div class="form-grup">
+                        <label for="masa-durumu">Durum</label>
+                        <select id="masa-durumu">
+                            <option value="bos">Boş</option>
+                            <option value="dolu">Dolu</option>
+                            <option value="rezerve">Rezerve</option>
+                        </select>
+                    </div>
+                    <div class="form-grup" id="misafir-form" style="display: none;">
+                        <label for="misafir-sayisi">Misafir Sayısı</label>
+                        <input type="number" id="misafir-sayisi" min="1" value="1">
+                    </div>
+                    <div class="form-grup" id="villa-form" style="display: none;">
+                        <label for="villa-no">Villa Numarası</label>
+                        <input type="text" id="villa-no" placeholder="Villa Numarası">
+                    </div>
+                    <div class="form-grup">
+                        <label for="masa-garson">Garson</label>
+                        <select id="masa-garson">
+                            <option value="">Seçiniz</option>
+                            <!-- Garsonlar JavaScript ile buraya eklenecek -->
+                        </select>
+                    </div>
+                    <div class="form-grup">
+                        <label for="masa-notlar">Notlar</label>
+                        <textarea id="masa-notlar" rows="3"></textarea>
+                    </div>
+                    <div class="form-grup" id="misafir-zaman" style="display: none;">
+                        <p>Giriş Zamanı: <span id="giris-zamani">--:--</span></p>
+                        <p>Geçen Süre: <span id="gecen-sure">0 dk</span></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn danger" id="masa-sil" style="display: none;">Masa Sil</button>
+                <button class="btn success" id="masa-kaydet">Kaydet</button>
+                <button class="btn primary" id="misafir-ekle" style="display: none;">Müşteri Ekle</button>
+                <button class="btn warning" id="misafir-kaldir" style="display: none;">Müşteri Kaldır</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Müşteri Ekleme Modalı -->
+    <div class="modal" id="misafir-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Müşteri Ekle</h3>
+                <button class="kapat-btn" id="misafir-modal-kapat">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="misafir-ekle-form">
+                    <div class="form-grup">
+                        <label for="musteri-villa-no">Villa Numarası</label>
+                        <input type="text" id="musteri-villa-no" placeholder="Villa Numarası" required>
+                    </div>
+                    <div class="form-grup">
+                        <label for="musteri-sayisi">Misafir Sayısı (PAX)</label>
+                        <input type="number" id="musteri-sayisi" min="1" value="1" required>
+                    </div>
+                    <div class="form-grup">
+                        <label for="musteri-garson">Garson</label>
+                        <select id="musteri-garson">
+                            <option value="">Seçiniz</option>
+                            <!-- Garsonlar JavaScript ile buraya eklenecek -->
+                        </select>
+                    </div>
+                    <div class="form-grup">
+                        <label for="musteri-not">Notlar</label>
+                        <textarea id="musteri-not" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn success" id="musteri-kaydet">Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/statistics.js"></script>
+    
+    <!-- Service Worker Kaydı -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker başarıyla kaydedildi:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker kaydı başarısız oldu:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
