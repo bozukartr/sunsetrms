@@ -1,5 +1,5 @@
-const CACHE_NAME = 'rms-cache-v2';
-const BASE_PATH = './';
+const CACHE_NAME = 'rms-cache-v3';
+const BASE_PATH = '/sunsetrms/';
 
 const ASSETS_TO_CACHE = [
   BASE_PATH,
@@ -43,9 +43,13 @@ self.addEventListener('activate', (event) => {
 
 // İstekleri yakalama ve önbellekten yanıtlama
 self.addEventListener('fetch', (event) => {
-  // GitHub Pages'deki yolu düzelt
   const url = new URL(event.request.url);
   const requestPath = url.pathname;
+
+  // GitHub Pages repository yolunu kontrol et
+  if (!requestPath.startsWith(BASE_PATH)) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request)
@@ -70,8 +74,8 @@ self.addEventListener('fetch', (event) => {
             return response;
           }
         ).catch(() => {
-          // HTML dosyaları için index.html'e yönlendir
-          if (requestPath.endsWith('.html') || requestPath === '/' || requestPath === '') {
+          // Ana sayfa için yönlendirme
+          if (requestPath === BASE_PATH || requestPath === `${BASE_PATH}index.html`) {
             return caches.match(`${BASE_PATH}index.html`);
           }
           
