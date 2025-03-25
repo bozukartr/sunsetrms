@@ -1,11 +1,13 @@
-const CACHE_NAME = 'rms-cache-v1';
+const CACHE_NAME = 'rms-cache-v2';
+const BASE_PATH = './';
+
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './css/style.css',
-  './js/app.js',
-  './js/statistics.js',
-  './manifest.json',
+  BASE_PATH,
+  `${BASE_PATH}index.html`,
+  `${BASE_PATH}css/style.css`,
+  `${BASE_PATH}js/app.js`,
+  `${BASE_PATH}js/statistics.js`,
+  `${BASE_PATH}manifest.json`,
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
@@ -41,24 +43,23 @@ self.addEventListener('activate', (event) => {
 
 // İstekleri yakalama ve önbellekten yanıtlama
 self.addEventListener('fetch', (event) => {
+  // GitHub Pages'deki yolu düzelt
+  const url = new URL(event.request.url);
+  const requestPath = url.pathname;
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Önbellekte varsa oradan döndür
         if (response) {
           return response;
         }
-        
-        // Değilse ağdan getir ve önbelleğe ekle
+
         return fetch(event.request).then(
           (response) => {
-            // Geçersiz yanıt veya opaque yanıtları (CORS hatası olanlar) önbelleğe ekleme
             if (!response || response.status !== 200 || response.type === 'opaque') {
               return response;
             }
 
-            // Önbelleğe eklemek için yanıtın bir kopyasını oluştur
-            // (Yanıtlar stream olduğu için sadece bir kez kullanılabilir)
             let responseToCache = response.clone();
             
             caches.open(CACHE_NAME)
@@ -68,14 +69,18 @@ self.addEventListener('fetch', (event) => {
 
             return response;
           }
-        );
-      })
-      .catch(() => {
-        // Ağ bağlantısı yoksa veya istek başarısızsa
-        // Offline sayfasına yönlendir veya varsayılan bir sayfa göster
-        if (event.request.url.includes('.html')) {
-          return caches.match('/index.html');
-        }
+        ).catch(() => {
+          // HTML dosyaları için index.html'e yönlendir
+          if (requestPath.endsWith('.html') || requestPath === '/' || requestPath === '') {
+            return caches.match(`${BASE_PATH}index.html`);
+          }
+          
+          // Diğer kaynaklar için 404 döndür
+          return new Response('Resource not found', {
+            status: 404,
+            statusText: 'Not Found'
+          });
+        });
       })
   );
 }); 
